@@ -209,10 +209,7 @@ if platform?(%w{smartos})
   #
   # Needed for Mysql to correctly start as SmartOS services take a little bit longer to enable
   #
-  execute "waiting for mysql daemon" do
-    command "sleep 5"
-    action :run
-  end
+  sleep(5)
 end
 
 
