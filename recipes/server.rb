@@ -206,10 +206,6 @@ if platform?(%w{smartos})
   service "mysql" do
     action  [ :enable, :start ]
   end
-  #
-  # Needed for Mysql to correctly start as SmartOS services take a little bit longer to enable
-  #
-  sleep(5)
 end
 
 
