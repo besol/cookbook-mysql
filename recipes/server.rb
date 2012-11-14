@@ -30,15 +30,15 @@ if Chef::Config[:solo]
 
   if !missing_attrs.empty?
     Chef::Application.fatal!([
-      "You must set #{missing_attrs.join(', ')} in chef-solo mode.",
-      "For more information, see https://github.com/opscode-cookbooks/mysql#chef-solo-note"
-    ].join(' '))
+                                 "You must set #{missing_attrs.join(', ')} in chef-solo mode.",
+                                 "For more information, see https://github.com/opscode-cookbooks/mysql#chef-solo-note"
+                             ].join(' '))
   end
 else
   # generate all passwords
   node.set_unless['mysql']['server_debian_password'] = secure_password
-  node.set_unless['mysql']['server_root_password']   = secure_password
-  node.set_unless['mysql']['server_repl_password']   = secure_password
+  node.set_unless['mysql']['server_root_password'] = secure_password
+  node.set_unless['mysql']['server_repl_password'] = secure_password
 end
 
 if platform?(%w{debian ubuntu})
@@ -89,6 +89,16 @@ if platform? 'windows'
   end
 end
 
+
+
+if platform? 'smartos'
+  include_recipe 'pkgin'
+
+  def package(*args, &blk)
+    pkgin_package(*args, &blk)
+  end
+end
+
 node['mysql']['server']['packages'].each do |package_name|
   package package_name do
     action :install
@@ -129,12 +139,12 @@ unless platform?(%w{mac_os_x})
   end
 
   skip_federated = case node['platform']
-                   when 'fedora', 'ubuntu', 'amazon'
-                     true
-                   when 'centos', 'redhat', 'scientific'
-                     node['platform_version'].to_f < 6.0
-                   else
-                     false
+                     when 'fedora', 'ubuntu', 'amazon'
+                       true
+                     when 'centos', 'redhat', 'scientific'
+                       node['platform_version'].to_f < 6.0
+                     else
+                       false
                    end
 
   template "#{node['mysql']['conf_dir']}/my.cnf" do
@@ -143,12 +153,12 @@ unless platform?(%w{mac_os_x})
     group node['mysql']['root_group'] unless platform? 'windows'
     mode "0644"
     case node['mysql']['reload_action']
-    when 'restart'
-      notifies :restart, resources(:service => "mysql"), :immediately
-    when 'reload'
-      notifies :reload, resources(:service => "mysql"), :immediately
-    else
-      Chef::Log.info "my.cnf updated but mysql.reload_action is #{node['mysql']['reload_action']}. No action taken."
+      when 'restart'
+        notifies :restart, resources(:service => "mysql"), :immediately
+      when 'reload'
+        notifies :reload, resources(:service => "mysql"), :immediately
+      else
+        Chef::Log.info "my.cnf updated but mysql.reload_action is #{node['mysql']['reload_action']}. No action taken."
     end
     variables :skip_federated => skip_federated
   end
@@ -171,16 +181,42 @@ execute "assign-root-password" do
   only_if "\"#{node['mysql']['mysql_bin']}\" -u root -e 'show databases;'"
 end
 
+if platform?(%w{smartos})
+  directory "/var/log/mysql" do
+    owner "root"
+    group node['mysql']['root_group']
+    action :create
+    recursive true
+  end
+
+  file "/var/log/mysql/slow.log" do
+    owner "root"
+    group node['mysql']['root_group']
+    mode "0660"
+    action :touch
+  end
+
+  execute "mysql-install-db" do
+    command "mysql_install_db --verbose --user=#{node['mysql']['root_group']} --basedir=\"#{node['mysql']['basedir'] }\" --datadir=#{node['mysql']['data_dir']} --tmpdir=/tmp"
+    environment('TMPDIR' => nil)
+    action :run
+    creates "#{node['mysql']['data_dir']}/mysql"
+  end
+
+  service "mysql" do
+    action  [ :enable, :start ]
+  end
+end
+
+
 # Homebrew has its own way to do databases
 if platform?(%w{mac_os_x})
-
   execute "mysql-install-db" do
     command "mysql_install_db --verbose --user=`whoami` --basedir=\"$(brew --prefix mysql)\" --datadir=#{node['mysql']['data_dir']} --tmpdir=/tmp"
     environment('TMPDIR' => nil)
     action :run
     creates "#{node['mysql']['data_dir']}/mysql"
   end
-
 else
   grants_path = node['mysql']['grants_path']
   begin
@@ -209,8 +245,9 @@ else
       subscribes :run, resources("template[#{grants_path}]"), :immediately
     end
   end
-
-  service "mysql" do
-    action :start
+  unless platform?(%w{smartos})
+    service "mysql" do
+      action  [ :enable, :start ]
+    end
   end
 end

@@ -1,3 +1,7 @@
+## v1.3.1:
+
+* [COOK-1904] SmartOS support for Mysql
+
 ## v1.3.0:
 
 **Important note for this release**

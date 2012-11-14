@@ -53,6 +53,23 @@ when "freebsd"
   set['mysql']['pid_file']                    = "/var/run/mysqld/mysqld.pid"
   set['mysql']['old_passwords']               = 0
   set['mysql']['grants_path']                 = "/var/db/mysql/grants.sql"
+when "smartos"  
+  default['mysql']['server']['packages']      = %w{tcp_wrappers mysql-server}
+  default['mysql']['package_name']            = "mysql-server"
+  default['mysql']['service_name']            = "mysql"
+  default['mysql']['basedir']                 = "/opt/local"
+  default['mysql']['data_dir']                = "/var/mysql"
+  default['mysql']['root_group']              = "root"
+  default['mysql']['mysqladmin_bin']          = "/opt/local/bin/mysqladmin"
+  default['mysql']['mysql_bin']               = "/opt/local/bin/mysql"
+  default['mysql']['root_group']              = "mysql"
+
+  set['mysql']['conf_dir']                    = '/etc'
+  set['mysql']['confd_dir']                   = '/etc/mysql/conf.d'
+  set['mysql']['socket']                      = "/tmp/mysql.sock"
+  set['mysql']['pid_file']                    = "/var/mysql/mysql.pid"
+  set['mysql']['old_passwords']               = 0
+  set['mysql']['grants_path']                 = "/opt/local/share/mysql/grants.sql"
 when "windows"
   default['mysql']['server']['packages']      = ["MySQL Server 5.5"]
   default['mysql']['version']                 = '5.5.21'

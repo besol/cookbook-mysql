@@ -31,6 +31,8 @@ when "ubuntu","debian"
   end
 when "freebsd"
   default['mysql']['client']['packages'] = %w{mysql55-client}
+when "smartos"
+  default['mysql']['client']['packages'] = %w{p5-File-Temp p5-DBD-mysql mysql-client}
 when "windows"
   default['mysql']['client']['version']      = "6.0.2"
   default['mysql']['client']['arch']         = "win32" # force 32 bit to work with mysql gem

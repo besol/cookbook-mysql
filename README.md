@@ -14,6 +14,7 @@ Platform
 * Debian, Ubuntu
 * CentOS, Red Hat, Fedora
 * Mac OS X (Using homebrew)
+* SmartOS (Using pkgin)
 
 Tested on:
 
@@ -21,6 +22,7 @@ Tested on:
 * Ubuntu 10.04-12.04
 * CentOS 5.5-5.8, 6.2-6.3
 * Mac OS X 10.7.2
+* SmartOS
 
 Cookbooks
 ---------
@@ -211,6 +213,7 @@ License and Author
 - Author:: Brian Bianco (<brian.bianco@gmail.com>)
 - Author:: Jesse Howarth (<him@jessehowarth.com>)
 - Author:: Andrew Crump (<andrew@kotirisoftware.com>)
+- Author:: Javier Perez-Griffo (<javier@tapp.in>)
 
 Copyright:: 2009-2012 Opscode, Inc
 

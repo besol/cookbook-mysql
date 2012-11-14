@@ -29,8 +29,17 @@ node.set['build_essential']['compiletime'] = true
 include_recipe "build-essential"
 include_recipe "mysql::client"
 
-node['mysql']['client']['packages'].each do |mysql_pack|
-  resources("package[#{mysql_pack}]").run_action(:install)
+if platform? 'smartos'
+	include_recipe 'pkgin'
+	node['mysql']['client']['packages'].each do |mysql_pack|
+		pkgin_package mysql_pack do
+			action :install
+		end
+	end
+else
+	node['mysql']['client']['packages'].each do |mysql_pack|
+		resources("package[#{mysql_pack}]").run_action(:install)
+	end
 end
 
 chef_gem "mysql"
