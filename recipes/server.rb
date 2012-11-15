@@ -173,14 +173,6 @@ unless Chef::Config[:solo]
   end
 end
 
-# set the root password for situations that don't support pre-seeding.
-# (eg. platforms other than debian/ubuntu & drop-in mysql replacements)
-execute "assign-root-password" do
-  command "\"#{node['mysql']['mysqladmin_bin']}\" -u root password \"#{node['mysql']['server_root_password']}\""
-  action :run
-  only_if "\"#{node['mysql']['mysql_bin']}\" -u root -e 'show databases;'"
-end
-
 if platform?(%w{smartos})
   directory "/var/log/mysql" do
     owner "root"
@@ -206,8 +198,24 @@ if platform?(%w{smartos})
   service "mysql" do
     action  [ :enable, :start ]
   end
+
+  #
+  # Needed for Mysql to correctly start as SmartOS services take a little bit longer to enable
+  #
+  execute "waiting for mysql daemon" do
+    command "sleep 3"
+    action :run
+  end
+
 end
 
+# set the root password for situations that don't support pre-seeding.
+# (eg. platforms other than debian/ubuntu & drop-in mysql replacements)
+execute "assign-root-password" do
+  command "\"#{node['mysql']['mysqladmin_bin']}\" -u root password \"#{node['mysql']['server_root_password']}\""
+  action :run
+  only_if "\"#{node['mysql']['mysql_bin']}\" -u root -e 'show databases;'"
+end
 
 # Homebrew has its own way to do databases
 if platform?(%w{mac_os_x})
