@@ -72,6 +72,12 @@ platform and version.
 * `node['mysql']['data_dir']` - Location for mysql data directory
 * `node['mysql']['ec2_path']` - location of mysql data_dir on EC2
   nodes
+* `node['mysql']['allow_remote_root']` - Whether access as root must
+  be allowed to connections originating in hosts other than localhost. 
+  Defaults to false.
+* `node['mysql']['root_network_acl']` - A network or host address or a 
+  set of the former from which the user will be able to log in if root 
+  remote access is allowed, default is from anywhere.
 * `node['mysql']['grants_path']` - Path where the grants.sql should be
   written
 * `node['mysql']['mysqladmin_bin']` - Path to the mysqladmin binary

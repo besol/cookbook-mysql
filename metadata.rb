@@ -44,6 +44,16 @@ attribute "mysql/ec2_path",
   :display_name => "MySQL EC2 Path",
   :description => "Location of mysql directory on EC2 instance EBS volumes",
   :default => "/mnt/mysql"
+  
+attribute "mysql/allow_remote_root",
+  :display_name => 'Allow remote root connections',
+  :description => 'Whether access as root must be allowed to connections originating in hosts other than localhost',
+  :default => 'false'  
+
+attribute "mysql/root_network_acl",
+  :display_name => 'Root network ACL',
+  :description => 'A network or host address specified in MySQL grant format or a set of the former, from which the user will be able to log in',
+  :default => '%'
 
 attribute "mysql/reload_action",
   :display_name => "MySQL conf file reload action",

@@ -10,6 +10,8 @@ GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%' identified by '<%= node['mysql']['s
 
 # Set the server root password. This should be preseeded by the package installation.
 <% if node['mysql']['allow_remote_root'] -%>
-GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '<%= node['mysql']['server_root_password'] %>' WITH GRANT OPTION;
+	<% [* node['mysql']['root_network_acl']].each do |network_acl_item| -%>
+GRANT ALL ON *.* TO 'root'@'<%= network_acl_item %>' IDENTIFIED BY '<%= node['mysql']['server_root_password'] %>' WITH GRANT OPTION;
+	<% end -%>
 <% end -%>
 SET PASSWORD FOR 'root'@'localhost' = PASSWORD('<%= node['mysql']['server_root_password'] %>');
