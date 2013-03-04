@@ -54,8 +54,8 @@ when "freebsd"
   set['mysql']['old_passwords']               = 0
   set['mysql']['grants_path']                 = "/var/db/mysql/grants.sql"
 when "smartos"  
-  default['mysql']['server']['packages']      = %w{tcp_wrappers mysql-server}
-  default['mysql']['package_name']            = "mysql-server"
+  default['mysql']['server']['packages']      = %w{tcp_wrappers mysql-server-5.5}
+  default['mysql']['package_name']            = "mysql-server-5.5"
   default['mysql']['service_name']            = "mysql"
   default['mysql']['basedir']                 = "/opt/local"
   default['mysql']['data_dir']                = "/var/mysql"

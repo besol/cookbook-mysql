@@ -95,7 +95,7 @@ if platform? 'smartos'
   include_recipe 'pkgin'
 
   def package(*args, &blk)
-    pkgin_package(*args, &blk)
+     pkgin_package(*args, &blk)
   end
 end
 
@@ -174,18 +174,37 @@ unless Chef::Config[:solo]
 end
 
 if platform?(%w{smartos})
+
+  directory "/var/mysql" do
+    owner "mysql"
+    group node['mysql']['root_group']
+    action :create
+    recursive true
+  end
+
   directory "/var/log/mysql" do
-    owner "root"
+    owner "mysql"
     group node['mysql']['root_group']
     action :create
     recursive true
   end
 
   file "/var/log/mysql/slow.log" do
-    owner "root"
+    owner "mysql"
     group node['mysql']['root_group']
     mode "0660"
     action :touch
+  end
+
+  service "mysql" do
+    action  [ :enable, :start ]
+  end
+  #
+  # Needed for Mysql to correctly start as SmartOS services take a little bit longer to enable
+  #
+  execute "waiting for mysql daemon" do
+    command "sleep 5"
+    action :run
   end
 
   execute "mysql-install-db" do
@@ -195,17 +214,7 @@ if platform?(%w{smartos})
     creates "#{node['mysql']['data_dir']}/mysql"
   end
 
-  service "mysql" do
-    action  [ :enable, :start ]
-  end
 
-  #
-  # Needed for Mysql to correctly start as SmartOS services take a little bit longer to enable
-  #
-  execute "waiting for mysql daemon" do
-    command "sleep 3"
-    action :run
-  end
 
 end
 
